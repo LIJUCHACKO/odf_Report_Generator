@@ -38,7 +38,7 @@ func (Note1 *Notes) NewTextSpan(text string, Style string) *TextSpan {
 		//office_style
 		styletext := `<styles><office:automatic-styles>
 				<style:style style:name="` + Style_name + `" style:family="text">
-					<style:text-properties fo:font-weight="normal" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
+					<style:text-properties/>
         		</style:style>
 				</office:automatic-styles></styles>`
 
@@ -73,4 +73,16 @@ func (Text *TextSpan) ToUnderLine() {
 	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:text-underline-style", "solid")
 	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:text-underline-width", "auto")
 	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:text-underline-color", "font-color")
+}
+func (Text *TextSpan) ToNormal() {
+	styletextproperty, _ := xmlDB.GetNode(Text.Note.Content, Text.StyleId, "style:text-properties")
+	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "fo:font-weight", "normal")
+	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:font-weight-asian", "normal")
+	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:font-weight-complex", "normal")
+	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:text-underline-style", "")
+	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:text-underline-width", "")
+	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:text-underline-color", "")
+	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "fo:font-style", "")
+	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:font-style-asian", "")
+	xmlDB.UpdateAttributevalue(Text.Note.Content, styletextproperty[0], "style:font-style-complex", "")
 }

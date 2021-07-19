@@ -19,8 +19,7 @@ import (
 type Paragraph struct {
 	NodeId  int
 	StyleId int
-	//xmlDBptr *xmlDB.Database
-	Note *Notes
+	Note    *Notes
 }
 
 func (Note *Notes) NewParagraph(Style string) *Paragraph {
@@ -43,7 +42,8 @@ func (Note *Notes) NewParagraph(Style string) *Paragraph {
 			</office:styles>
 			<office:automatic-styles>
 				<style:style style:name="` + Style_name + `" style:family="paragraph" style:parent-style-name="Text_20_body">
-	            	<style:text-properties/>
+					<style:paragraph-properties fo:margin-top="0cm" fo:margin-bottom="0cm" loext:contextual-spacing="false" fo:line-height="100%"/>
+					<style:text-properties style:font-name="Liberation Sans" fo:font-size="12pt" style:font-size-asian="12pt" style:font-size-complex="12pt" fo:font-weight="normal" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
 	            </style:style>
 			</office:automatic-styles></styles>`
 		id := Note.WritetoScratchpad(styletext)
@@ -76,4 +76,50 @@ func (Para *Paragraph) GetPlainText() string {
 		Output = Output + xmlDB.GetNodeValue(Para.Note.Content, item)
 	}
 	return Output
+}
+
+func (Para *Paragraph) SetFontType(fontname string) {
+	styletextproperty, _ := xmlDB.GetNode(Para.Note.Content, Para.StyleId, "style:text-properties")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:font-name", fontname)
+}
+
+func (Para *Paragraph) SetFontSize(size int) {
+	font := strconv.Itoa(size) + "pt"
+	styletextproperty, _ := xmlDB.GetNode(Para.Note.Content, Para.StyleId, "style:text-properties")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "fo:font-size", font)
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:font-size-asian", font)
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:font-size-complexr", font)
+}
+func (Para *Paragraph) SetMargins(top int, bottom int) {
+	styletextproperty, _ := xmlDB.GetNode(Para.Note.Content, Para.StyleId, "style:paragraph-properties")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "fo:margin-top", strconv.Itoa(top)+"cm")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "fo:margin-bottom", strconv.Itoa(bottom)+"cm")
+}
+func (Para *Paragraph) SetLineHeight(height int) {
+	styletextproperty, _ := xmlDB.GetNode(Para.Note.Content, Para.StyleId, "style:paragraph-properties")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "fo:line-height", strconv.Itoa(height)+"%")
+}
+
+func (Para *Paragraph) ToBold() {
+	styletextproperty, _ := xmlDB.GetNode(Para.Note.Content, Para.StyleId, "style:text-properties")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "fo:font-weight", "bold")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:font-weight-asian", "bold")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:font-weight-complex", "bold")
+}
+func (Para *Paragraph) ToItalic() {
+	styletextproperty, _ := xmlDB.GetNode(Para.Note.Content, Para.StyleId, "style:text-properties")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "fo:font-style", "italic")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:font-style-asian", "italic")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:font-style-complex", "italic")
+
+}
+func (Para *Paragraph) ToUnderLine() {
+	styletextproperty, _ := xmlDB.GetNode(Para.Note.Content, Para.StyleId, "style:text-properties")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:text-underline-style", "solid")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:text-underline-width", "auto")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "style:text-underline-color", "font-color")
+}
+
+func (Para *Paragraph) AddListStyleName(value string) {
+	xmlDB.UpdateAttributevalue(Para.Note.Content, Para.StyleId, "style:list-style-name", value)
 }

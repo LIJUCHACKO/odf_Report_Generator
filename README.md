@@ -2,6 +2,8 @@
 This library generates Report from ODF template document. Labels in template document are replaced to generate Report document. 
 Remaining of portions of the document are not modified.
 
+![working](working.png)
+
 ## Implemented following
  - Header
  - Paragraph

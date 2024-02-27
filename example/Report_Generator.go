@@ -47,6 +47,15 @@ func main() {
 	C11.AddText("D", "")
 	Note.CreateArticle(Table.NodeId, "!%Table%!")
 
+	Picture := Note.NewPicture("","periodic-table-bw-download.jpg")
+	Note.CreateArticle(Picture.NodeId, "!%Picture1%!")
+
+
+	Parag := Note.NewParagraph("")
+	Parag.AddText("kjjjj","")
+	Parag.AddTextSpan(Text2)
+	Note.CreateArticle(Parag.NodeId, "!%Para3%!")
+
 	//Processing template to generate final report
 	odf.ProcessOdtfile("Report_Template.odt", "Report.odt", Note)
 }

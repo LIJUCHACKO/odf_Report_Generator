@@ -13,6 +13,7 @@ import (
 	"io"
 
 	"github.com/LIJUCHACKO/XmlDB"
+	"path/filepath"
 )
 
 type Odt struct {
@@ -322,6 +323,29 @@ func ProcessOdtfile(Inputfile string, Outputfile string, Note *Notes) {
 		fmt.Println(err)
 	}
 	defer r.Close()
+
+	//adding additional files
+	for ind, file_path := range Note.OrginalPictureFiles {
+		f1, err := os.Open(file_path)
+		if err != nil {
+			panic(err)
+		}
+		defer f1.Close()
+
+		fmt.Println("writing first file to archive...")
+		//file_name := filepath.Base(file_path)
+		//extension := filepath.Ext(file_path)
+		filenameinside := Note.NewPictureFiles[ind]//"Pictures/"+strconv.Itoa(rand.Intn(10000000))+extension
+		w1, err := targetzipwriter.Create(filenameinside)
+		if err != nil {
+			panic(err)
+		}
+		if _, err := io.Copy(w1, f1); err != nil {
+			panic(err)
+		}
+	}
+	///
+
 	for _, f := range r.File {
 		//fmt.Println(f.Name)
 		fileToZip, _ := f.Open()
@@ -330,6 +354,7 @@ func ProcessOdtfile(Inputfile string, Outputfile string, Note *Notes) {
 		header.Name = f.Name
 		header.Method = zip.Deflate
 		writer, _ := targetzipwriter.CreateHeader(header)
+
 		if f.Name == "content.xml" {
 			xmlfile, _ := ioutil.ReadAll(fileToZip)
 			xmlstring := string(xmlfile)
@@ -361,7 +386,21 @@ func ProcessOdtfile(Inputfile string, Outputfile string, Note *Notes) {
 			//MERGE STYLES
 			Doc.ImportStyles(Note)
 			_, _ = writer.Write([]byte(xmlDB.Dump_DB(Doc.Content)))
-		} else {
+		} else if f.Name == "META-INF/manifest.xml" {
+			xmlfile, _ := ioutil.ReadAll(fileToZip)
+			xmlstring := string(xmlfile)
+			var DB *xmlDB.Database = new(xmlDB.Database)
+			DB.MaxNooflines = 999
+			xmllines := strings.Split(xmlstring, "\n")
+			xmlDB.Load_dbcontent(DB, xmllines)
+			DB.Debug_enabled = false
+			for _, file_path := range Note.NewPictureFiles {
+				extension := filepath.Ext(file_path)
+				extension=strings.ReplaceAll(extension, ".", "" )
+				xmlDB.InserSubNode(DB, 0,`<manifest:file-entry manifest:full-path="`+file_path+`" manifest:media-type="image/`+ extension+`"/>`)
+			}
+			_, _ = writer.Write([]byte(xmlDB.Dump_DB(DB)))
+	    } else {
 
 			io.Copy(writer, fileToZip)
 		}

@@ -66,6 +66,16 @@ func (Para *Paragraph) AddText(text string, textspanstyle string) *TextSpan {
 	//xmlDB.InserSubNode(Para.Note.Content, Para.NodeId, xmlDB.GetNodeContentRaw(Para.Note.Content, textspan.NodeId)) //<<
 	return textspan
 }
+func (Para *Paragraph) AddTextSpan(textspan *TextSpan)  {
+	//textspan := Para.Note.NewTextSpan(text, textspanstyle)
+	xmlDB.CutPasteAsSubNode(Para.Note.Content, Para.NodeId, textspan.NodeId)
+	//xmlDB.InserSubNode(Para.Note.Content, Para.NodeId, xmlDB.GetNodeContentRaw(Para.Note.Content, textspan.NodeId)) //<<
+}
+func (Para *Paragraph) Wrap(pic *Picture)  {
+	//textspan := Para.Note.NewTextSpan(text, textspanstyle)
+	xmlDB.CutPasteAsSubNode(Para.Note.Content, Para.NodeId, pic.NodeId)
+	//xmlDB.InserSubNode(Para.Note.Content, Para.NodeId, xmlDB.GetNodeContentRaw(Para.Note.Content, textspan.NodeId)) //<<
+}
 func (Para *Paragraph) GetPlainText() string {
 	if xmlDB.IslowestNode(Para.Note.Content, Para.NodeId) {
 		return xmlDB.GetNodeValue(Para.Note.Content, Para.NodeId)

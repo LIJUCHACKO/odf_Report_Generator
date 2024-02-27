@@ -1,7 +1,9 @@
 package odf
 
 import (
-	//"fmt"
+	"archive/zip"
+	"fmt"
+	"io/ioutil"
 	"strings"
 
 	"github.com/LIJUCHACKO/XmlDB"
@@ -16,6 +18,8 @@ type Notes struct {
 	scratchpadid      int
 	Officeautostyleid int
 	Officestyleid     int
+	OrginalPictureFiles   []string
+	NewPictureFiles   []string
 }
 
 func NewDatabase() *Notes {
@@ -89,4 +93,82 @@ func (Note *Notes) CreateArticle(Nodeid int, name string) *Article {
 }
 func (Art *Article) AddContentArticle(Nodeid int) {
 	xmlDB.InserSubNode(Art.Content, Art.Nodeid, xmlDB.GetNodeContentRaw(Art.Content, Nodeid))
+}
+
+/**below function is not complete**/
+func (Note *Notes) CreateArticleFromTemplate(Inputfile string, ArtName string) *Article {
+	r, err := zip.OpenReader(Inputfile)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer r.Close()
+	var Art *Article = new(Article)
+	styletext := `<styles>`
+	for _, f := range r.File {
+		//fmt.Println(f.Name)
+		fileToZip, _ := f.Open()
+		//defer fileToZip.Close()
+		//	header, _ := zip.FileInfoHeader(f.FileInfo())
+		//header.Name = f.Name
+		//header.Method = zip.Deflate
+		//writer, _ := targetzipwriter.CreateHeader(header)
+		if f.Name == "content.xml" {
+			xmlfile, _ := ioutil.ReadAll(fileToZip)
+			xmlstring := string(xmlfile)
+
+			//xmlline = processString(xmlline)
+			var DB *xmlDB.Database = new(xmlDB.Database)
+			DB.MaxNooflines = 9999999
+			xmllines := strings.Split(xmlstring, "\n")
+			xmlDB.Load_dbcontent(DB, xmllines)
+			DB.Debug_enabled = false
+			var Doc *Odt = new(Odt)
+			Doc.Content = DB
+			Doc.ReplaceMarkers(Note)
+			//MERGE STYLES
+			Doc.ImportAutoStyles(Note)
+			remNodeid, _ := xmlDB.GetNode(Doc.Content, 0, "office:body/office:forms")
+			xmlDB.RemoveNode(Doc.Content, remNodeid[0])
+			remNodeid, _ = xmlDB.GetNode(Doc.Content, 0, "office:body/text:sequence-decls")
+			xmlDB.RemoveNode(Doc.Content, remNodeid[0])
+			Nodeid, _ := xmlDB.GetNode(Doc.Content, 0, "office:body/office:text")
+
+			xmlstring = "<article name=\"" + ArtName + "\">" + xmlDB.GetNodeContentRaw(Doc.Content, Nodeid[0]) + "</article>"
+			id := Note.WritetoScratchpad(xmlstring)
+			Art.Content = Note.Content
+			Art.Nodeid = id
+			Styleid, _ := xmlDB.GetNode(Doc.Content, 0, "office:automatic-styles")
+			styletext = styletext + `<office:automatic-styles>` + xmlDB.GetNodeContentRaw(Doc.Content, Styleid[0]) + `</office:automatic-styles>`
+
+			//_, _ = writer.Write([]byte(xmlDB.Dump_DB(Doc.Content)))
+		} else if f.Name == "styles.xml" {
+			xmlfile, _ := ioutil.ReadAll(fileToZip)
+			xmlstring := string(xmlfile)
+
+			//xmlline = processString(xmlline)
+			var DB *xmlDB.Database = new(xmlDB.Database)
+			DB.MaxNooflines = 9999999
+			xmllines := strings.Split(xmlstring, "\n")
+			xmlDB.Load_dbcontent(DB, xmllines)
+			DB.Debug_enabled = false
+			var Doc *Odt = new(Odt)
+			Doc.Content = DB
+			//MERGE STYLES
+			Doc.ImportStyles(Note)
+			Styleid, _ := xmlDB.GetNode(Doc.Content, 0, "office:styles")
+			styletext = styletext + `<office:styles>` + xmlDB.GetNodeContentRaw(Doc.Content, Styleid[0]) + `</office:styles>`
+			//_, _ = writer.Write([]byte(xmlDB.Dump_DB(Doc.Content)))
+		} else {
+
+			//io.Copy(writer, fileToZip)
+		}
+
+		fileToZip.Close()
+
+	}
+	styletext = styletext + `</styles>`
+	id := Note.WritetoScratchpad(styletext)
+	Note.IncludeStyle(id)
+
+	return Art
 }

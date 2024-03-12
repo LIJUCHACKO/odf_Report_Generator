@@ -77,10 +77,10 @@ func (Pict *Picture) Style() string {
 	return Style_name
 }
 
-func (Pict *Picture) SetMargins(top int, bottom int) {
+func (Pict *Picture) SetSize(ht int, wdth int) {
 	styletextproperty, _ := xmlDB.GetNode(Pict.Note.Content, Pict.NodeId, "draw:frame")
-	xmlDB.UpdateAttributevalue(Pict.Note.Content, styletextproperty[0], "svg:height", strconv.Itoa(top)+"cm")
-	xmlDB.UpdateAttributevalue(Pict.Note.Content, styletextproperty[0], "svg:width", strconv.Itoa(bottom)+"cm")
+	xmlDB.UpdateAttributevalue(Pict.Note.Content, styletextproperty[0], "svg:height", strconv.Itoa(ht)+"cm")
+	xmlDB.UpdateAttributevalue(Pict.Note.Content, styletextproperty[0], "svg:width", strconv.Itoa(wdth)+"cm")
 }
 
 

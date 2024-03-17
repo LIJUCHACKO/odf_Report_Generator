@@ -32,8 +32,8 @@ func (Note1 *Notes) NewTextSpan(text string, Style string) *TextSpan {
 	}
 
 	//office_Text
-	Text.NodeId = Note1.WritetoScratchpad("<text:span text:style-name=\"" + Style_name + "\">" + text + "</text:span>")
-
+	Text.NodeId = Note1.WritetoScratchpad("<text:span text:style-name=\"" + Style_name + "\"></text:span>")
+    xmlDB.UpdateNodevalue(Note1.Content, Text.NodeId, text)
 	if len(strings.TrimSpace(Style)) == 0 {
 		//office_style
 		styletext := `<styles><office:automatic-styles>

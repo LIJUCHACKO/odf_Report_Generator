@@ -14,11 +14,11 @@ func main() {
 	Note := odf.NewDatabase()
 
 	///First Article
-	Text := Note.NewTextSpan("21", "")
+	Text := Note.NewTextSpan("21+5", "")
 	Text.ToItalic()
 	Text.ToBold()
 	Note.CreateArticle(Text.NodeId, "!%Para1%!")
-	Text2 := Note.NewTextSpan("23", "")
+	Text2 := Note.NewTextSpan("23&7<9", "")
 	Note.CreateArticle(Text2.NodeId, "!%Para2%!")
 
 	///Second Article
@@ -42,9 +42,9 @@ func main() {
 	C01 := Table.AddItemPara(0, 1, "")
 	C01.AddText("B", "")
 	C10 := Table.AddItemPara(1, 0, "")
-	C10.AddText("C", "")
+	C10.AddText("<C/>", "")
 	C11 := Table.AddItemPara(1, 1, "")
-	C11.AddText("D", "")
+	C11.AddText("{D}", "")
 	Note.CreateArticle(Table.NodeId, "!%Table%!")
 
 	Picture := Note.NewPicture("","periodic-table-bw-download.jpg")

@@ -33,6 +33,7 @@ func NewDatabase() *Notes {
 	xmllines := strings.Split(text, "\n")
 	var xml_content *xmlDB.Database = new(xmlDB.Database)
 	///xml_content.Debug_enabled = true
+	xml_content.Libreofficemod = true
 	xmlDB.Load_dbcontent(xml_content, xmllines)
 	Note.Content = xml_content
 	scratchpadids, _ := xmlDB.GetNode(xml_content, 0, "scratchpad")

@@ -362,9 +362,11 @@ func ProcessOdtfile(Inputfile string, Outputfile string, Note *Notes) {
 			//xmlline = processString(xmlline)
 			var DB *xmlDB.Database = new(xmlDB.Database)
 			DB.MaxNooflines = 9999999
+
 			xmllines := strings.Split(xmlstring, "\n")
 			xmlDB.Load_dbcontent(DB, xmllines)
 			DB.Debug_enabled = false
+			DB.Libreofficemod= true
 			var Doc *Odt = new(Odt)
 			Doc.Content = DB
 			Doc.ReplaceMarkers(Note)
@@ -381,6 +383,7 @@ func ProcessOdtfile(Inputfile string, Outputfile string, Note *Notes) {
 			xmllines := strings.Split(xmlstring, "\n")
 			xmlDB.Load_dbcontent(DB, xmllines)
 			DB.Debug_enabled = false
+			DB.Libreofficemod= true
 			var Doc *Odt = new(Odt)
 			Doc.Content = DB
 			//MERGE STYLES
@@ -394,6 +397,7 @@ func ProcessOdtfile(Inputfile string, Outputfile string, Note *Notes) {
 			xmllines := strings.Split(xmlstring, "\n")
 			xmlDB.Load_dbcontent(DB, xmllines)
 			DB.Debug_enabled = false
+			DB.Libreofficemod= false
 			for _, file_path := range Note.NewPictureFiles {
 				extension := filepath.Ext(file_path)
 				extension=strings.ReplaceAll(extension, ".", "" )

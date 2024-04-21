@@ -69,7 +69,9 @@ func (Doc *Odt) CreateMarkerNodes() { //newmodified
 	paraNodeids, _ := xmlDB.GetNode(docxml, 0, "office:body/office:text/../text:p")
 	for _, NodeId := range paraNodeids {
 		//fmt.Println(NodeId)
+		//fmt.Printf("\n==============================")
 		//fmt.Println(xmlDB.GetNodeContents(docxml, NodeId))
+		//xmlDB.NodeDebug(docxml, NodeId)
 		markerpresent := true
 		for markerpresent {
 			items := xmlDB.ChildNodes(docxml, NodeId)
@@ -122,6 +124,7 @@ func (Doc *Odt) CreateMarkerNodes() { //newmodified
 					start := 0
 					items := xmlDB.ChildNodes(docxml, NodeId)
 					if xmlDB.IslowestNode(docxml, NodeId) {
+						//only one  node
 						StartCase = 1
 						StopCase = 1
 						startid = NodeId
@@ -133,31 +136,45 @@ func (Doc *Odt) CreateMarkerNodes() { //newmodified
 							//fmt.Println(xmlDB.GetNodeContents(docxml, item))
 							if xmlDB.IslowestNode(docxml, item) {
 								childcontent := xmlDB.GetNodeValue(docxml, item)
+								//fmt.Println("childcontent=")
 								//fmt.Println(childcontent)
 								if marker_start >= start && marker_start < start+children_boundaries[ind] && children_boundaries[ind] != 0 {
+									// <> ffd!%marke..... </>
+									//
 									//fmt.Printf("\nmarker_start %d  start %d  children_boundaries[ind] %d ind %d\n", marker_start, start, children_boundaries[ind], ind)
 									started = true
 									startid = item
 									StartCase = 2
 									if start+children_boundaries[ind] >= marker_start+len(marker) {
-
+										// <> ffd!%marker%!kij </>
 										StopCase = 2
-										xmlDB.UpdateNodevalue(docxml, item, childcontent[0:(marker_start-start)])
-										newids, _ := xmlDB.AppendAfterNode(docxml, item, xmlDB.GetNodeContents(docxml, item))
+										//fmt.Println("\n inside if=node content="+xmlDB.GetNodeContentRaw(docxml, item))
+										//fmt.Println("\ninside if="+childcontent[0:(marker_start-start)])
+										xmlDB.UpdateNodevalue(docxml, item, childcontent[0:(marker_start-start)])//==>  <> ffd</>
+										newNode:=xmlDB.GetNodeContentRaw(docxml, item)
+
+										newids, _ := xmlDB.AppendAfterNode(docxml, item,newNode )//just to maintaine node name
+										//==>  <> ffd</><>ffd!%marker%!kij</>
 										xmlDB.UpdateNodevalue(docxml, newids[0], childcontent[(marker_start+len(marker)-start):])
+										//==> <> ffd</><>kij</>
 										endid = newids[0]
 									} else {
-										xmlDB.UpdateNodevalue(docxml, item, childcontent[0:(marker_start-start)])
+										// <> ffd!%mark</>
+										xmlDB.UpdateNodevalue(docxml, item, childcontent[0:(marker_start-start)])//==> <> ffd</>
+
 									}
 
 								} else if started {
 									//fmt.Printf("\nmarker_start %d  start %d  children_boundaries[ind] %d ind %d\n", marker_start, start, children_boundaries[ind], ind)
 									if start < marker_start+len(marker) {
 										if start+children_boundaries[ind] >= marker_start+len(marker) {
+											// <>er%!kij</>
 											endid = item
 											StopCase = 2
 											xmlDB.UpdateNodevalue(docxml, item, childcontent[(marker_start+len(marker)-start):])
+											// <>kij</>
 										} else {
+											// <>arke</>
 											xmlDB.RemoveNode(docxml, item)
 										}
 
@@ -182,7 +199,7 @@ func (Doc *Odt) CreateMarkerNodes() { //newmodified
 										if start+children_boundaries[ind] >= marker_start+len(marker) {
 											StopCase = 3
 											xmlDB.UpdateNodevalue(docxml, item2, childcontent[0:(marker_start-start)])
-											newids, _ := xmlDB.AppendAfterNode(docxml, item2, xmlDB.GetNodeContents(docxml, item2))
+											newids, _ := xmlDB.AppendAfterNode(docxml, item2, xmlDB.GetNodeContentRaw(docxml, item2))
 											xmlDB.UpdateNodevalue(docxml, newids[0], childcontent[(marker_start+len(marker)-start):])
 											endid = newids[0]
 										} else {
@@ -285,12 +302,12 @@ func (Doc *Odt) ReplaceMarkers(Note *Notes) {
 			// fmt.Printf("\n%d\n", id)
 			// xmlDB.NodeDebug(Doc.Content, id)
 			items := xmlDB.ChildNodes(Note.Content, article)
-			fmt.Printf("\n Replacing %d", id)
+			//fmt.Printf("\n Replacing %d", id)
 			//fmt.Println(xmlDB.GetNodeContentRaw(Note.Content, article))
 			fmt.Println(items)
 			previousitemid := -1
 			for index, item := range items {
-				fmt.Println(xmlDB.GetNodeContentRaw(Note.Content, item))
+				//fmt.Println(xmlDB.GetNodeContentRaw(Note.Content, item))
 				if index == 0 {
 					newids, _ := xmlDB.ReplaceNode(Doc.Content, id, xmlDB.GetNodeContentRaw(Note.Content, item))
 					previousitemid = newids[0]

@@ -23,28 +23,30 @@ type Picture struct {
 	Note    *Notes
 
 }
-
+var randnoPic int=0
 func (Note *Notes) NewPicture(Style string,PicFile string) *Picture {
 
 	var Pict *Picture = new(Picture)
 	Pict.Note = Note
-	Style_name := "Pic" + strconv.Itoa(rand.Intn(100))
+	Style_name := "Pic" + strconv.Itoa(rand.Intn(100)+randnoPic)
+	randnoPic=randnoPic+1
 	if len(strings.TrimSpace(Style)) > 0 {
 		Style_name = strings.TrimSpace(Style)
 	}
 	extension := filepath.Ext(PicFile)
 	Note.OrginalPictureFiles=append(Note.OrginalPictureFiles,PicFile)
 
-	filenameinside := "Pictures/"+strconv.Itoa(rand.Intn(10000000))+extension
+	filenameinside := "Pictures/"+strconv.Itoa(rand.Intn(10000000)+randnoPic)+extension
+	randnoPic=randnoPic+1
 	Note.NewPictureFiles=append(Note.NewPictureFiles,filenameinside)
 	//Picture.FileNameInside=filenameinside;
 	//Picture.FileName=PicFile;
 	//office_Text
 	//fmt.println()
-	Pict.NodeId = Note.WritetoScratchpad(`<draw:frame draw:style-name="`+Style_name+`" draw:name="Image`+strconv.Itoa(rand.Intn(100))+`" text:anchor-type="char" svg:x="0cm" svg:y="0.229cm" svg:width="17cm" svg:height="11.137cm" draw:z-index="0">
+	Pict.NodeId = Note.WritetoScratchpad(`<draw:frame draw:style-name="`+Style_name+`" draw:name="Image`+strconv.Itoa(rand.Intn(100)+randnoPic)+`" text:anchor-type="char" svg:x="0cm" svg:y="0.229cm" svg:width="17cm" svg:height="11.137cm" draw:z-index="0">
 	<draw:image xlink:href="`+filenameinside+`" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
 	</draw:frame>`)
-
+	randnoPic=randnoPic+1
 	NewPara := Note.NewParagraph("")
 
 	NewPara.Wrap(Pict)

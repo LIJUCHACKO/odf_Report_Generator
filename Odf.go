@@ -67,6 +67,8 @@ func (Doc *Odt) CreateMarkerNodes() { //newmodified
 	docxml := Doc.Content
 
 	paraNodeids, _ := xmlDB.GetNode(docxml, 0, "office:body/office:text/../text:p")
+	headerNodeids, _ := xmlDB.GetNode(docxml, 0, "office:body/office:text/../text:h")
+	paraNodeids=append(paraNodeids,headerNodeids...)
 	for _, NodeId := range paraNodeids {
 		//fmt.Println(NodeId)
 		//fmt.Printf("\n==============================")

@@ -21,11 +21,12 @@ type Paragraph struct {
 	StyleId int
 	Note    *Notes
 }
-
+var randnoPara int=0
 func (Note *Notes) NewParagraph(Style string) *Paragraph {
 
 	var Para *Paragraph = new(Paragraph)
-	Style_name := "PS" + strconv.Itoa(rand.Intn(100))
+	Style_name := "PS" + strconv.Itoa(rand.Intn(100)+randnoPara)
+	randnoPara=randnoPara+1
 	if len(strings.TrimSpace(Style)) > 0 {
 		Style_name = strings.TrimSpace(Style)
 	}
@@ -110,6 +111,10 @@ func (Para *Paragraph) SetLineHeight(height int) {
 	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "fo:line-height", strconv.Itoa(height)+"%")
 }
 
+func (Para *Paragraph) AddPageBreakBefore() {
+	styletextproperty, _ := xmlDB.GetNode(Para.Note.Content, Para.StyleId, "style:paragraph-properties")
+	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "fo:break-before","page")
+}
 func (Para *Paragraph) ToBold() {
 	styletextproperty, _ := xmlDB.GetNode(Para.Note.Content, Para.StyleId, "style:text-properties")
 	xmlDB.UpdateAttributevalue(Para.Note.Content, styletextproperty[0], "fo:font-weight", "bold")

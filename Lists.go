@@ -15,20 +15,21 @@ type List struct {
 	Note        *Notes
 	ListStyleId int
 }
-
+var randnoList int=0
 func (Note *Notes) NewNumberedList(Style string) *List {
 	var List *List = new(List)
 	List.Note = Note
-	ListStyle_name := "PLS" + strconv.Itoa(rand.Intn(100))
+	ListStyle_name := "PLS" + strconv.Itoa(rand.Intn(100)+randnoList)
+	randnoList=randnoList+1
 	if len(strings.TrimSpace(Style)) > 0 {
 		ListStyle_name = strings.TrimSpace(Style)
 	}
 	//fmt.Println("Style name=" + ListStyle_name)
 
 	//office_Text
-	List.NodeId = Note.WritetoScratchpad("<text:list xml:id=\"list5252122" + strconv.Itoa(rand.Intn(100)) + "\" text:style-name=\"" + ListStyle_name + "\"/>")
+	List.NodeId = Note.WritetoScratchpad("<text:list xml:id=\"list5252122" + strconv.Itoa(rand.Intn(100)+randnoList) + "\" text:style-name=\"" + ListStyle_name + "\"/>")
 	//	List.Office_Text = xml_content
-
+    randnoList=randnoList+1
 	if len(strings.TrimSpace(Style)) == 0 {
 		//office_style
 		styletext := `<styles>

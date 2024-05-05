@@ -20,11 +20,12 @@ type Table struct {
 	CellStyleId   int
 	Note          *Notes
 }
-
+var randnoTable int =0
 func (Note *Notes) NewTable(noofcols int, noofrows int, Style string) *Table {
 	var Table *Table = new(Table)
 	//fmt.Println(rand.Intn(100))
-	Style_name := "Tbl" + strconv.Itoa(rand.Intn(100))
+	Style_name := "Tbl" + strconv.Itoa(rand.Intn(100)+randnoTable)
+	randnoTable=randnoTable+1
 	Table.Note = Note
 	if len(strings.TrimSpace(Style)) > 0 {
 		Style_name = strings.TrimSpace(Style)

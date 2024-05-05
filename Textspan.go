@@ -21,12 +21,13 @@ const (
 	ITALIC           // ITALIC = 1
 	UNDERLINE        // uNDERLINE = 2
 )
-
+var randnoTex int=0
 func (Note1 *Notes) NewTextSpan(text string, Style string) *TextSpan {
 
 	var Text *TextSpan = new(TextSpan)
 	Text.Note = Note1
-	Style_name := "TS" + strconv.Itoa(rand.Intn(100))
+	Style_name := "TS" + strconv.Itoa(rand.Intn(100)+randnoTex)
+	randnoTex=randnoTex+1;
 	if len(strings.TrimSpace(Style)) > 0 {
 		Style_name = strings.TrimSpace(Style)
 	}
